@@ -1,113 +1,71 @@
+'use client'
 import Image from "next/image";
+import React, {useRef} from "react";
+import {gsap} from "gsap";
+
+
 
 export default function Home() {
+
+  const plane1 = useRef(null);
+  const plane2 = useRef(null);
+  const plane3 = useRef(null);
+  const speed = 0.1;
+  const easing: number = 0.8;
+
+  let xForce = 0;
+  let yForce = 0;
+  let requestAnimationFrameId: number | null = null;
+
+  const animate = () => {
+    xForce = lerp(xForce, 0, easing);
+    yForce = lerp(yForce, 0, easing);
+    gsap.set(plane1.current, {x: `+=${xForce * 0.45}`, y:`+=${yForce * 0.45}`})
+    gsap.set(plane2.current, {x: `+=${xForce* 0.95}`, y:`+=${yForce * 0.95}`})
+    gsap.set(plane3.current, {x: `+=${xForce * 0.7}`, y:`+=${yForce * 0.7}`})
+    requestAnimationFrame(animate)
+
+    if(Math.abs(xForce) < 0.01)xForce = 0;
+    if(Math.abs(yForce) < 0.01)yForce = 0;
+  }
+
+  const manageMouseMove = (e: any) => {
+    const {movementX, movementY} = e;
+    xForce += movementX * speed;
+    yForce += movementY * speed;
+
+    if(!requestAnimationFrameId){
+      requestAnimationFrameId = requestAnimationFrame(animate)
+     
+    } else{
+      cancelAnimationFrame(requestAnimationFrameId)
+      requestAnimationFrameId = null
+    }
+
+
+  }
+
+  const lerp = (start:any, end:any, amount:any) => start * (1 - amount) + end * amount;
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      <div className="z-10 w-full max-w-5xl items-center justify-between font-mono text-sm lg:flex">
-        <p className="fixed left-0 top-0 flex w-full justify-center border-b border-gray-300 bg-gradient-to-b from-zinc-200 pb-6 pt-8 backdrop-blur-2xl dark:border-neutral-800 dark:bg-zinc-800/30 dark:from-inherit lg:static lg:w-auto  lg:rounded-xl lg:border lg:bg-gray-200 lg:p-4 lg:dark:bg-zinc-800/30">
-          Get started by editing&nbsp;
-          <code className="font-mono font-bold">src/app/page.tsx</code>
-        </p>
-        <div className="fixed bottom-0 left-0 flex h-48 w-full items-end justify-center bg-gradient-to-t from-white via-white dark:from-black dark:via-black lg:static lg:size-auto lg:bg-none">
-          <a
-            className="pointer-events-none flex place-items-center gap-2 p-8 lg:pointer-events-auto lg:p-0"
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{" "}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className="dark:invert"
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
-        </div>
-      </div>
+    <main onMouseMove={(e) => manageMouseMove(e)} className="h-[100vh] bg-black w-[100vw] flex justify-center items-center overflow-hidden relative">
+      <div className=" flex flex-col justify-center items-center text-white font-mainFont text-2xl">Floating Gallery
+      <div className="text-slate-500 ">Made with Next.js and GSAP</div></div>
+     <div ref={plane1} className="w-full h-full absolute">
+        <Image className="absolute brightness-20 right-[5%] top-[65%]" src='/image1.jpg' alt="plane1" width={200} height={200}  />
+        <Image  className="absolute brightness-75 left-[25%] top-[15%]"  src='/image2.jpg' alt="plane2" width={200} height={200}  />
+        <Image  className="absolute  right-[5%] top-[05%]"  src='/image3.jpg' alt="plane3" width={200} height={200}  />
 
-      <div className="relative z-[-1] flex place-items-center before:absolute before:h-[300px] before:w-full before:-translate-x-1/2 before:rounded-full before:bg-gradient-radial before:from-white before:to-transparent before:blur-2xl before:content-[''] after:absolute after:-z-20 after:h-[180px] after:w-full after:translate-x-1/3 after:bg-gradient-conic after:from-sky-200 after:via-blue-200 after:blur-2xl after:content-[''] before:dark:bg-gradient-to-br before:dark:from-transparent before:dark:to-blue-700 before:dark:opacity-10 after:dark:from-sky-900 after:dark:via-[#0141ff] after:dark:opacity-40 sm:before:w-[480px] sm:after:w-[240px] before:lg:h-[360px]">
-        <Image
-          className="relative dark:drop-shadow-[0_0_0.3rem_#ffffff70] dark:invert"
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
-      </div>
-
-      <div className="mb-32 grid text-center lg:mb-0 lg:w-full lg:max-w-5xl lg:grid-cols-4 lg:text-left">
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className="mb-3 text-2xl font-semibold">
-            Docs{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className="m-0 max-w-[30ch] text-sm opacity-50">
-            Find in-depth information about Next.js features and API.
-          </p>
-        </a>
-
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className="mb-3 text-2xl font-semibold">
-            Learn{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className="m-0 max-w-[30ch] text-sm opacity-50">
-            Learn about Next.js in an interactive course with&nbsp;quizzes!
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className="mb-3 text-2xl font-semibold">
-            Templates{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className="m-0 max-w-[30ch] text-sm opacity-50">
-            Explore starter templates for Next.js.
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className="mb-3 text-2xl font-semibold">
-            Deploy{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className="m-0 max-w-[30ch] text-balance text-sm opacity-50">
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
-      </div>
+     </div>
+     <div ref={plane2} className="w-full h-full absolute">
+        <Image  className="absolute brightness-50 left-[25%] top-[65%]"  src='/image4.jpg' alt="plane4" width={200} height={200} />
+        <Image  className="absolute brightness-50 left-[5%] top-[45%]"  src='/images5.jpg' alt="plane5" width={200} height={200} />
+        <Image  className="absolute brightness-75 left-[65%] top-[55%]"  src='/images6.jpg' alt="plane6" width={200} height={200} />
+     </div>
+     <div ref={plane3} className="w-full h-full absolute">
+        <Image  className="absolute brightness-75 left-[45%] top-[65%]"  src='/images7.jpg' alt="plane7" width={200} height={200} />
+        <Image  className="absolute brightness-50 left-[55%] top-[5%]"  src='/images8.jpg' alt="plane8" width={200} height={200} />
+        <Image  className="absolute  left-[5%] top-[5%]"  src='/images9.jpg' alt="plane9" width={200} height={200} />
+     </div>
     </main>
   );
 }
